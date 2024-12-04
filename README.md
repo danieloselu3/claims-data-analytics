@@ -1,4 +1,4 @@
-# Ecommerce Cloud Data Architecture Terraform Setup
+# Ecommerce Cloud Data Analytics
 
 ## Prerequisites
 
