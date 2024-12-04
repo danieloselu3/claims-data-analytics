@@ -39,3 +39,16 @@ variable "data_fusion_type" {
     error_message = "Data Fusion instance type must be BASIC, DEVELOPER, or ENTERPRISE."
   }
 }
+
+# Cloud Composer Configuration
+variable "composer_machine_type" {
+  description = "Machine type for Cloud Composer environment"
+  type        = string
+  default     = "e2-standard-2"
+}
+
+variable "composer_image_version" {
+  description = "Image version for Cloud Composer environment"
+  type        = string
+  default     = "composer-2.1.1-airflow-2.4.3"
+}
