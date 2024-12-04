@@ -8,7 +8,7 @@ terraform {
   }
 }
 
-# Configure the Google Cloud provider
+# Google Cloud provider configuration
 provider "google" {
   project = var.project_id
   region  = var.region
