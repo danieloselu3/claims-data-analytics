@@ -14,20 +14,34 @@ provider "google" {
   region  = var.region
 }
 
-# Cloud Storage Buckets for Raw, Cleanse, and Serve Layers
-resource "google_storage_bucket" "raw_layer" {
-  name          = "${var.project_id}-raw-layer"
+# Cloud Storage Bucket for Data Layers
+resource "google_storage_bucket" "data_layers" {
+  name          = "${var.project_id}-data-layers"
   location      = var.region
   force_destroy = true
 
   lifecycle_rule {
     condition {
-      age = 30
+      age = var.raw_layer_lifecycle_days
+      matches_prefix = ["raw/"]
     }
     action {
       type = "delete"
     }
   }
+}
+
+# Placeholder objects to create folder-like structure in GCS
+resource "google_storage_bucket_object" "raw_folder" {
+  name    = "raw/"
+  content = "Placeholder for raw data layer"
+  bucket  = google_storage_bucket.data_layers.name
+}
+
+resource "google_storage_bucket_object" "cleanse_folder" {
+  name    = "cleanse/"
+  content = "Placeholder for cleansed data layer"
+  bucket  = google_storage_bucket.data_layers.name
 }
 
 # BigQuery Dataset
@@ -65,4 +79,49 @@ resource "google_compute_subnetwork" "data_subnetwork" {
   ip_cidr_range = var.network_cidr
   region        = var.region
   network       = google_compute_network.data_network.id
+}
+
+# Cloud Composer Environment
+resource "google_composer_environment" "ecommerce_airflow" {
+  name    = "ecommerce-airflow-environment"
+  region  = var.region
+  config {
+    node_config {
+      zone         = "${var.region}-a"
+      machine_type = var.composer_machine_type
+
+      network    = google_compute_network.data_network.id
+      subnetwork = google_compute_subnetwork.data_subnetwork.id
+    }
+
+    software_config {
+      image_version = var.composer_image_version
+      
+      # Optional: Add environment variables if needed
+      env_variables = {
+        PROJECT_ID = var.project_id
+      }
+    }
+
+    workloads_config {
+      scheduler {
+        cpu        = 1
+        memory_gb  = 1.875
+      }
+      web_server {
+        cpu        = 1
+        memory_gb  = 1.875
+      }
+      worker {
+        cpu        = 1
+        memory_gb  = 1.875
+      }
+    }
+  }
+
+  # Dependency to ensure network is created first
+  depends_on = [
+    google_compute_network.data_network,
+    google_compute_subnetwork.data_subnetwork
+  ]
 }
