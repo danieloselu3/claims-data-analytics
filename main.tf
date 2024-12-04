@@ -65,6 +65,7 @@ resource "google_data_fusion_instance" "ecommerce_data_fusion" {
   
   network_config {
     network = google_compute_network.data_network.name
+    ip_allocation = "10.0.0.0/29"
   }
 }
 
@@ -87,34 +88,26 @@ resource "google_composer_environment" "ecommerce_airflow" {
   region  = var.region
   config {
     node_config {
-      zone         = "${var.region}-a"
-      machine_type = var.composer_machine_type
-
       network    = google_compute_network.data_network.id
       subnetwork = google_compute_subnetwork.data_subnetwork.id
     }
 
     software_config {
       image_version = var.composer_image_version
-      
-      # Optional: Add environment variables if needed
-      env_variables = {
-        PROJECT_ID = var.project_id
-      }
     }
 
     workloads_config {
       scheduler {
         cpu        = 1
-        memory_gb  = 1.875
+        memory_gb  = 2
       }
       web_server {
         cpu        = 1
-        memory_gb  = 1.875
+        memory_gb  = 2
       }
       worker {
         cpu        = 1
-        memory_gb  = 1.875
+        memory_gb  = 2
       }
     }
   }
