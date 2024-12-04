@@ -40,15 +40,8 @@ variable "data_fusion_type" {
   }
 }
 
-# Cloud Composer Configuration
-variable "composer_machine_type" {
-  description = "Machine type for Cloud Composer environment"
-  type        = string
-  default     = "e2-standard-2"
-}
-
 variable "composer_image_version" {
   description = "Image version for Cloud Composer environment"
   type        = string
-  default     = "composer-2.1.1-airflow-2.4.3"
+  default     = "composer-3-airflow-2.7.3"
 }
